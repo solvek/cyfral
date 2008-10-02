@@ -33,18 +33,28 @@ function cyfral_install () {
 
 register_activation_hook(__FILE__,'cyfral_install');
 
-function cyfral_project_editor($post_id)
+function cyfral_project_editor()
 {
-	echo '<div class="postbox">' . "\n";	
+	global $wpdb, $post;
+	
+	$project = $wpdb->get_row("SELECT * FROM {$wpdb->prefix}projects WHERE ID = {$post->ID}");
+	
+	if ($project)
+		$vol_str = $project->volume;
+	else
+		$vol_str = '';
+		
+	echo '<div class="postbox">' . "\n";
 	echo "<h3><a class='togbox'>+</a>".__("Work Volume", "cyfral")."</h3>\n";
 	echo '<div class="inside">' . "\n";
-	echo '<label for="volumework">'.__("Work Volume", "cyfral").': </label><input type="text" name="volumework" style="width: 40px" id="volumework" value="" /><span>'.__(" quantums", "cyfral").'</span>'. "\n";	
-	echo '<p>'.__("Quantums of work. Enter a number from 1 to 100000.", "cyfral").'</p>';
+	echo '<label for="volumework">'.__("Work Volume", "cyfral").': </label><input type="text" name="volumework" style="width: 60px" id="volumework" value="'.$vol_str.'" /><span>'.__(" quantums", "cyfral").'</span>'. "\n";	
+	echo '<p>'.__("Quantums of work. Enter a number from 2 to 100000.", "cyfral").'</p>';
 	echo "</div>\n";
 	echo "</div>\n";
 }
 
 add_action('edit_form_advanced', 'cyfral_project_editor');
+add_action('simple_edit_form', 'cyfral_project_editor');
 
 function cyfral_save_project_info($post_id, $post)
 {
@@ -59,5 +69,6 @@ function cyfral_save_project_info($post_id, $post)
 }
 
 add_action('save_post', 'cyfral_save_project_info', 11, 2);
+add_action('publish_post', 'cyfral_save_project_info', 11, 2);
 
 ?>
